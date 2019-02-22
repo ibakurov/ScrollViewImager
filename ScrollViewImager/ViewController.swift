@@ -3,13 +3,13 @@
 //  ScrollViewImager
 //
 //  Created by Romain Menke on 29/09/15.
+//  Updated by Illya Bakurov on 22/02/19
 //  Copyright © 2015 menke dev. All rights reserved.
 //
 
 import UIKit
 
 class ViewController: UIViewController, UICollectionViewDelegateFlowLayout, UICollectionViewDataSource {
-    
     
     var collectionView: UICollectionView!
     var cellsInSection : Int = 0
@@ -22,11 +22,11 @@ class ViewController: UIViewController, UICollectionViewDelegateFlowLayout, UICo
         
     }
     
-    override func prefersStatusBarHidden() -> Bool {
+    override var prefersStatusBarHidden: Bool {
         return true
     }
     
-    override func viewDidAppear(animated: Bool) {
+    override func viewDidAppear(_ animated: Bool) {
         
         collectionVIewSetup()
         
@@ -58,13 +58,12 @@ class ViewController: UIViewController, UICollectionViewDelegateFlowLayout, UICo
             
             
             // generate screenshot
-            self.collectionView.screenshot(0.1) { (screenshot) -> Void in
-                
-                // display screenshot
+            self.collectionView.allowsMultipleSelection = true
+            self.collectionView.screenshot(scale: 2.0, completion: { screenshot in
+                //display screenshot
                 self.screenshotView.image = screenshot // this apparently has no trouble accepting an optional : Hooray!
-                self.screenshotView.contentMode = UIViewContentMode.ScaleAspectFit
-                
-            }
+                self.screenshotView.contentMode = UIView.ContentMode.scaleAspectFit
+            })
 
         }
     }
@@ -78,10 +77,11 @@ class ViewController: UIViewController, UICollectionViewDelegateFlowLayout, UICo
         numberOfSections = Int(256 / cellsInSection)
         
         collectionView = UICollectionView(frame: CGRect(x: 0.0, y: 100, width: self.view.frame.width, height: self.view.frame.height - 100), collectionViewLayout: UICollectionViewFlowLayout())
+        collectionView.backgroundColor = .white
         
         collectionView.dataSource = self
         collectionView.delegate = self
-        collectionView.registerClass(CollectionViewCell.self, forCellWithReuseIdentifier: "Cell")
+        collectionView.register(CollectionViewCell.self, forCellWithReuseIdentifier: "Cell")
         self.view.addSubview(collectionView)
         
         collectionView.reloadData()
@@ -92,33 +92,32 @@ class ViewController: UIViewController, UICollectionViewDelegateFlowLayout, UICo
         return numberOfSections
     }
     
-    func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         
         return cellsInSection
     }
     
-    func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAtIndexPath indexPath: NSIndexPath) -> CGSize {
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         
         return CGSize(width: 50, height: 50)
         
     }
     
-    func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAtIndex section: Int) -> UIEdgeInsets {
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
         return UIEdgeInsets(top: 5, left: 5, bottom: 5, right: 5)
     }
     
-    func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAtIndex section: Int) -> CGFloat {
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
         return 5.0
     }
     
-    func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAtIndex section: Int) -> CGFloat {
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
         return 5.0
     }
     
-    func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
-        
-        guard let cell = collectionView.dequeueReusableCellWithReuseIdentifier("Cell", forIndexPath: indexPath) as? CollectionViewCell else {
-            let cell = collectionView.dequeueReusableCellWithReuseIdentifier("Cell", forIndexPath: indexPath)
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "Cell", for: indexPath) as? CollectionViewCell else {
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "Cell", for: indexPath)
             return cell
         }
         
